@@ -1,0 +1,146 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Products</a></li>
+            <li class="breadcrumb-item active">{{ product.name|truncatewords:6 }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Product Image -->
+        <div class="col-lg-6">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}" style="width:100%;max-height:450px;object-fit:cover;">
+            {% else %}
+            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height:400px;">
+                {% if product.product_type == 'tyre' %}
+                    <span style="font-size:6rem;">🛞</span>
+                {% elif product.product_type == 'rim' %}
+                    <span style="font-size:6rem;">⚙️</span>
+                {% else %}
+                    <span style="font-size:6rem;">🔧</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-6">
+            {% if product.brand %}
+            <p class="text-muted mb-1">{{ product.brand.name }}</p>
+            {% endif %}
+            <h2 style="font-weight:800;">{{ product.name }}</h2>
+
+            <div class="d-flex align-items-baseline gap-3 my-3">
+                <span style="font-size:2rem;font-weight:800;color:var(--accent);">HK${{ product.get_price }}</span>
+                {% if product.discount_price %}
+                <span style="font-size:1.2rem;text-decoration:line-through;color:#999;">HK${{ product.price }}</span>
+                <span class="badge bg-danger">-{{ product.get_discount_percent }}%</span>
+                {% endif %}
+            </div>
+
+            {% if product.tyre_size_display %}
+            <div class="alert alert-info py-2"><strong>Size:</strong> {{ product.tyre_size_display }}</div>
+            {% elif product.rim_size_display %}
+            <div class="alert alert-info py-2"><strong>Size:</strong> {{ product.rim_size_display }} | <strong>PCD:</strong> {{ product.rim_pcd|default:'N/A' }} | <strong>Offset:</strong> {{ product.rim_offset|default:'N/A' }}</div>
+            {% endif %}
+
+            <p>{{ product.description|linebreaks }}</p>
+
+            <!-- Add to Cart -->
+            <form method="post" action="{% url 'cart:cart_add' product.id %}" class="mt-3">
+                {% csrf_token %}
+                <div class="row g-2 align-items-end">
+                    <div class="col-3">
+                        <label class="form-label">Qty</label>
+                        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control">
+                    </div>
+                    <div class="col-9">
+                        <button type="submit" class="btn btn-accent btn-lg w-100">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- WhatsApp Order -->
+            <a href="https://wa.me/85212345678?text=Hi! I'm interested in {{ product.name }} (HK${{ product.get_price }})" class="btn btn-whatsapp w-100 mt-2" target="_blank">
+                <i class="bi bi-whatsapp"></i> Order via WhatsApp
+            </a>
+
+            <div class="mt-3">
+                <span class="badge bg-{% if product.stock > 0 %}success{% else %}danger{% endif %}">
+                    {% if product.stock > 0 %}In Stock ({{ product.stock }}){% else %}Out of Stock{% endif %}
+                </span>
+                {% if product.featured %}
+                <span class="badge bg-warning text-dark">Featured</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Specs -->
+    {% if product.product_type == 'tyre' and product.tyre_width %}
+    <div class="row mt-5">
+        <div class="col-lg-8">
+            <h4 style="font-weight:700;">Tyre Specifications</h4>
+            <table class="table specs-table">
+                <tr><td>Width</td><td>{{ product.tyre_width }}mm</td></tr>
+                <tr><td>Aspect Ratio</td><td>{{ product.tyre_aspect }}</td></tr>
+                <tr><td>Diameter</td><td>{{ product.tyre_diameter }}"</td></tr>
+                <tr><td>Load Index</td><td>{{ product.tyre_load_index|default:'N/A' }}</td></tr>
+                <tr><td>Speed Rating</td><td>{{ product.tyre_speed_rating|default:'N/A' }}</td></tr>
+            </table>
+        </div>
+    </div>
+    {% elif product.product_type == 'rim' and product.rim_diameter %}
+    <div class="row mt-5">
+        <div class="col-lg-8">
+            <h4 style="font-weight:700;">Rim Specifications</h4>
+            <table class="table specs-table">
+                <tr><td>Diameter</td><td>{{ product.rim_diameter }}"</td></tr>
+                <tr><td>Width</td><td>{{ product.rim_width }}"</td></tr>
+                <tr><td>PCD</td><td>{{ product.rim_pcd|default:'N/A' }}</td></tr>
+                <tr><td>Offset</td><td>{{ product.rim_offset|default:'N/A' }}</td></tr>
+                <tr><td>Center Bore</td><td>{{ product.rim_center_bore|default:'N/A' }}</td></tr>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Fitment Info -->
+    {% if fitments %}
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <h4 style="font-weight:700;">Fits These Cars</h4>
+            <div class="row g-2">
+                {% for f in fitments %}
+                <div class="col-auto">
+                    <span class="badge bg-secondary">{{ f.car_model.make.name }} {{ f.car_model.name }} {{ f.year_start }}{% if f.year_end and f.year_end != f.year_start %}-{{ f.year_end }}{% endif %}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Related Products -->
+    {% if related %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4 style="font-weight:700;">You May Also Like</h4>
+            <div class="row g-4 mt-2">
+                {% for product in related %}
+                {% include 'store/includes/product_card.html' with product=product %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
