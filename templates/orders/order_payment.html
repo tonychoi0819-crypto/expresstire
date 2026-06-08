@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}付款 | 訂單 #{{ order.order_number }} | {{ shop_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <h2 class="mb-4"><i class="bi bi-credit-card"></i> 提交付款證明</h2>
+            <p class="text-muted">訂單 #{{ order.order_number }} — 金額 <strong class="text-brand-red">HK${{ order.total|floatformat:0|intcomma }}</strong></p>
+
+            <div class="alert alert-info">
+                <h5>付款方法</h5>
+                <ul class="mb-0">
+                    <li><strong>FPS:</strong> expresstire@fps.hk (ExpressTire Ltd)</li>
+                    <li><strong>PayMe:</strong> WhatsApp {{ shop_whatsapp }} 索取 PayMe 鏈結</li>
+                    <li><strong>銀行轉賬:</strong> HSBC 123-456789-000 (ExpressTire Ltd)</li>
+                </ul>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">付款參考號碼</label>
+                            <input type="text" name="payment_ref" class="form-control" placeholder="FPS ref / 交易編號">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">上載收據 (截圖)</label>
+                            <input type="file" name="payment_proof" class="form-control" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">備註</label>
+                            <input type="text" name="notes" class="form-control" placeholder="如轉賬時間等">
+                        </div>
+                        <button type="submit" class="btn btn-brand w-100 py-2 fw-bold">
+                            <i class="bi bi-upload"></i> 提交付款證明
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <a href="{% url 'orders:order_detail' order.order_number %}" class="btn btn-outline-secondary w-100 mt-2">
+                <i class="bi bi-arrow-left"></i> 返回訂單
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
