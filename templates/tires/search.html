@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}搜尋輪胎 | {{ shop_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'tires:home' %}">主頁</a></li>
+            <li class="breadcrumb-item active">{% if is_size_search %}{{ query }} 尺寸{% else %}搜尋{% endif %}</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-3">
+        {% if is_size_search %}<code>{{ query }}</code> 尺寸輪胎{% else %}所有輪胎{% endif %}
+        <small class="text-muted fs-5">({{ total_variants }} 個結果{% if min_price %}，最低 HK${{ min_price|floatformat:0|intcomma }}{% endif %})</small>
+    </h2>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{% url 'tires:search' %}" class="row g-2 align-items-end">
+                <input type="hidden" name="q" value="{{ query }}">
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">闊度</label>
+                    <select name="width" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="185" {% if request.GET.width == "185" %}selected{% endif %}>185</option>
+                        <option value="195" {% if request.GET.width == "195" %}selected{% endif %}>195</option>
+                        <option value="205" {% if request.GET.width == "205" %}selected{% endif %}>205</option>
+                        <option value="215" {% if request.GET.width == "215" %}selected{% endif %}>215</option>
+                        <option value="225" {% if request.GET.width == "225" %}selected{% endif %}>225</option>
+                        <option value="235" {% if request.GET.width == "235" %}selected{% endif %}>235</option>
+                        <option value="245" {% if request.GET.width == "245" %}selected{% endif %}>245</option>
+                        <option value="255" {% if request.GET.width == "255" %}selected{% endif %}>255</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">扁平比</label>
+                    <select name="aspect" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="35" {% if request.GET.aspect == "35" %}selected{% endif %}>35</option>
+                        <option value="40" {% if request.GET.aspect == "40" %}selected{% endif %}>40</option>
+                        <option value="45" {% if request.GET.aspect == "45" %}selected{% endif %}>45</option>
+                        <option value="50" {% if request.GET.aspect == "50" %}selected{% endif %}>50</option>
+                        <option value="55" {% if request.GET.aspect == "55" %}selected{% endif %}>55</option>
+                        <option value="60" {% if request.GET.aspect == "60" %}selected{% endif %}>60</option>
+                        <option value="65" {% if request.GET.aspect == "65" %}selected{% endif %}>65</option>
+                        <option value="70" {% if request.GET.aspect == "70" %}selected{% endif %}>70</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">吋</label>
+                    <select name="diameter" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="15" {% if request.GET.diameter == "15" %}selected{% endif %}>15"</option>
+                        <option value="16" {% if request.GET.diameter == "16" %}selected{% endif %}>16"</option>
+                        <option value="17" {% if request.GET.diameter == "17" %}selected{% endif %}>17"</option>
+                        <option value="18" {% if request.GET.diameter == "18" %}selected{% endif %}>18"</option>
+                        <option value="19" {% if request.GET.diameter == "19" %}selected{% endif %}>19"</option>
+                        <option value="20" {% if request.GET.diameter == "20" %}selected{% endif %}>20"</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">類型</label>
+                    <select name="type" class="form-select form-select-sm">
+                        <option value="">All</option>
+                        <option value="performance" {% if request.GET.type == "performance" %}selected{% endif %}>Performance</option>
+                        <option value="touring" {% if request.GET.type == "touring" %}selected{% endif %}>Touring</option>
+                        <option value="suv" {% if request.GET.type == "suv" %}selected{% endif %}>SUV</option>
+                        <option value="ev" {% if request.GET.type == "ev" %}selected{% endif %}>EV</option>
+                        <option value="light_truck" {% if request.GET.type == "light_truck" %}selected{% endif %}>Light Truck</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label small">排序</label>
+                    <select name="sort" class="form-select form-select-sm">
+                        <option value="price_low" {% if request.GET.sort == "price_low" %}selected{% endif %}>價格 低→高</option>
+                        <option value="price_high" {% if request.GET.sort == "price_high" %}selected{% endif %}>價格 高→低</option>
+                        <option value="popular" {% if request.GET.sort == "popular" %}selected{% endif %}>熱門</option>
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <button type="submit" class="btn btn-brand btn-sm w-100"><i class="bi bi-funnel"></i> 過濾</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results -->
+    <div class="row g-3">
+        {% for variant in variants %}
+        <div class="col-12 col-md-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <small class="text-muted">{{ variant.tyre.brand.name }}</small>
+                            <h5 class="mb-1">
+                                <a href="{{ variant.tyre.get_absolute_url }}" class="text-decoration-none text-dark">{{ variant.tyre.name }}</a>
+                            </h5>
+                            <p class="mb-1">
+                                <span class="badge bg-dark fs-6">{{ variant.size_display }}</span>
+                                {% if variant.load_index %}
+                                <span class="badge bg-secondary">{{ variant.load_index }}{{ variant.speed_rating }}</span>
+                                {% endif %}
+                                {% if variant.notes %}
+                                <span class="badge bg-info">{{ variant.notes }}</span>
+                                {% endif %}
+                            </p>
+                            <p class="text-muted small mb-0">{{ variant.tyre.description|truncatewords:20 }}</p>
+                        </div>
+                        <div class="text-end">
+                            {% if variant.original_price %}
+                            <span class="original-price">HK${{ variant.original_price|floatformat:0 }}</span>
+                            {% endif %}
+                            <div class="price">HK${{ variant.price|floatformat:0|intcomma }}</div>
+                            <small class="text-muted">連安裝</small>
+                            {% if variant.discount_pct > 0 %}
+                            <div><span class="discount-badge">-{{ variant.discount_pct }}%</span></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                    <small class="{% if variant.in_stock %}text-success{% else %}text-danger{% endif %}">
+                        <i class="bi bi-{% if variant.in_stock %}check-circle{% else %}x-circle{% endif %}"></i>
+                        {% if variant.in_stock %}有貨 ({{ variant.stock_qty }}條){% else %}暫無存貨{% endif %}
+                    </small>
+                    <form action="{% url 'tires:cart_add' variant.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-brand btn-sm" {% if not variant.in_stock %}disabled{% endif %}>
+                            <i class="bi bi-cart-plus"></i> 加入購物車
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-search display-1 text-muted"></i>
+            <h4 class="mt-3">找不到符合條件的輪胎</h4>
+            <p class="text-muted">Try different size or <a href="{% url 'tires:enquiry' %}">contact us</a></p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
