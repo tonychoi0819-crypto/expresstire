@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}訂單 #{{ order.order_number }} | {{ shop_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Status banner -->
+            <div class="alert alert-{% if order.status == 'completed' %}success{% elif order.status == 'cancelled' %}danger{% elif order.status == 'paid' %}info{% endif %}">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1">訂單 #{{ order.order_number }}</h4>
+                        狀態: <strong>{{ order.get_status_display }}</strong>
+                    </div>
+                    <span class="display-6">
+                        {% if order.status == 'completed' %}✅{% elif order.status == 'cancelled' %}❌{% elif order.status == 'paid' %}💳{% else %}⏳{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-3">
+                <div class="card-header"><h5 class="mb-0">訂單詳情</h5></div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <p><strong>日期:</strong> {{ order.created|date:"Y-m-d H:i" }}</p>
+                            <p><strong>客戶:</strong> {{ order.customer_name }}</p>
+                            <p><strong>電話:</strong> {{ order.customer_phone }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>安裝方式:</strong> {{ order.get_install_type_display }}</p>
+                            <p><strong>安裝地點:</strong> {{ order.install_shop|default:"TBC" }}</p>
+                            <p><strong>付款方法:</strong> {{ order.get_payment_method_display|default:"Pending" }}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    <h6>產品</h6>
+                    <p>{{ order.items_summary }}</p>
+                    
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span>總額</span>
+                        <span class="fs-4">HK${{ order.total|floatformat:0|intcomma }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment action -->
+            {% if order.status == 'pending' %}
+            <div class="card shadow-sm border-warning mb-3">
+                <div class="card-header bg-warning text-dark"><h5 class="mb-0"><i class="bi bi-credit-card"></i> 請完成付款</h5></div>
+                <div class="card-body">
+                    <p>請將 <strong>HK${{ order.total|floatformat:0 }}</strong> 轉賬至以下帳戶：</p>
+                    <ul>
+                        <li><strong>FPS:</strong> expresstire@fps.hk (ExpressTire Ltd)</li>
+                        <li><strong>PayMe:</strong> 請WhatsApp {{ shop_whatsapp }} 索取PayMe鏈結</li>
+                        <li><strong>銀行轉賬:</strong> HSBC 123-456789-000 (ExpressTire Ltd)</li>
+                    </ul>
+                    
+                    <hr>
+                    <form method="POST" action="{% url 'orders:order_payment' order.order_number %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">付款參考號碼</label>
+                                <input type="text" name="payment_ref" class="form-control" placeholder="FPS ref / 交易編號">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">上載收據 (截圖)</label>
+                                <input type="file" name="payment_proof" class="form-control" accept="image/*">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">備註</label>
+                                <input type="text" name="notes" class="form-control" placeholder="如轉賬時間等">
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-brand w-100 py-2 fw-bold">
+                                    <i class="bi bi-upload"></i> 提交付款證明
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Track order steps -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6>訂單進度</h6>
+                    <div class="d-flex justify-content-between mt-3 position-relative" style="height: 60px;">
+                        <div style="position: absolute; top: 16px; left: 10%; right: 10%; height: 3px; background: #eee; z-index: 0;"></div>
+                        {% for s in "pending,paid,confirmed,installing,completed"|slice:":5" %}
+                        <div class="text-center position-relative" style="z-index: 1; width: 20%;">
+                            <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-light border" style="width: 32px; height: 32px;">
+                                <small>{{ forloop.counter }}</small>
+                            </div>
+                            <small class="d-block mt-1 text-capitalize" style="font-size: 0.65rem;">{{ s }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
