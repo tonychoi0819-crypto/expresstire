@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}結帳 | {{ shop_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'tires:home' %}">主頁</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'tires:cart_detail' %}">購物車</a></li>
+            <li class="breadcrumb-item active">結帳</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <form method="POST" action="{% url 'orders:checkout_process' %}">
+                {% csrf_token %}
+                
+                <!-- Customer info -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header"><h5 class="mb-0"><i class="bi bi-person"></i> 顧客資料</h5></div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">姓名 *</label>
+                                <input type="text" name="customer_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">電話 *</label>
+                                <input type="tel" name="customer_phone" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Email (選填)</label>
+                                <input type="email" name="customer_email" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Installation -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header"><h5 class="mb-0"><i class="bi bi-gear"></i> 安裝方式</h5></div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">安裝方式 *</label>
+                                <div class="d-flex gap-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="install_type" value="shop" id="install_shop" checked>
+                                        <label class="form-check-label" for="install_shop"><i class="bi bi-shop"></i> 到店安裝</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="install_type" value="mobile_day" id="install_mobile">
+                                        <label class="form-check-label" for="install_mobile"><i class="bi bi-truck"></i> 上門服務</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">分店 / 地點</label>
+                                <select name="install_shop" class="form-select">
+                                    <option value="ExpressTire 土瓜灣總店">土瓜灣總店 (Chi Kiang St)</option>
+                                    <option value="ExpressTire 火炭分店">火炭分店 (Fo Tan)</option>
+                                    <option value="上門安裝 — 請在備註注明地址">上門安裝 — 請在備註注明地址</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">偏好日期</label>
+                                <input type="date" name="install_date" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">偏好時間</label>
+                                <select name="install_time_slot" class="form-select">
+                                    <option value="">任何時間</option>
+                                    <option value="morning">上午 (8-12)</option>
+                                    <option value="afternoon">下午 (12-6)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header"><h5 class="mb-0"><i class="bi bi-credit-card"></i> 付款方式</h5></div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            {% for code, label in payment_methods %}
+                            <div class="col-6 col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="payment_method" value="{{ code }}" id="pay_{{ code }}" {% if forloop.first %}checked{% endif %}>
+                                    <label class="form-check-label" for="pay_{{ code }}">{{ label }}</label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="alert alert-info mt-3 mb-0 small">
+                            <i class="bi bi-info-circle"></i> 提交訂單後，您將收到付款指示（FPS號碼 / PayMe鏈結等）。確認付款後我們將預約安裝。
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="card shadow-sm mb-3">
+                    <div class="card-header"><h5 class="mb-0"><i class="bi bi-chat-left-text"></i> 備註</h5></div>
+                    <div class="card-body">
+                        <textarea name="notes" class="form-control" rows="3" placeholder="如有特別要求，請在此留言..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-brand w-100 py-3 fw-bold fs-5">
+                    <i class="bi bi-check2-circle"></i> 提交訂單
+                </button>
+            </form>
+        </div>
+
+        <!-- Order summary -->
+        <div class="col-lg-5">
+            <div class="card shadow-sm sticky-top" style="top: 80px;">
+                <div class="card-header"><h5 class="mb-0">訂單摘要</h5></div>
+                <div class="card-body">
+                    {% for item in cart %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ item.tyre_name }} {{ item.size }} x{{ item.quantity }}</span>
+                        <span>${{ item.total_price|floatformat:0 }}</span>
+                    </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span>總額</span>
+                        <span>${{ cart.get_total|floatformat:0 }}</span>
+                    </div>
+                    {% if discount %}
+                    <div class="d-flex justify-content-between text-danger">
+                        <span>折扣</span>
+                        <span>-${{ discount|floatformat:0 }}</span>
+                    </div>
+                    {% endif %}
+                    <hr>
+                    <div class="d-flex justify-content-between fs-4">
+                        <strong>合計</strong>
+                        <strong class="text-brand-red">${{ total|floatformat:0 }}</strong>
+                    </div>
+                    <small class="text-muted">* 已包含安裝及動平衡</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
