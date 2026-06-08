@@ -1,0 +1,46 @@
+{% load static %}
+<div class="col-6 col-md-3">
+    <div class="card product-card position-relative h-100">
+        {% if product.product_type == 'tyre' %}
+            <span class="type-badge">Tyre</span>
+        {% elif product.product_type == 'rim' %}
+            <span class="type-badge">Rim</span>
+        {% elif product.product_type == 'package' %}
+            <span class="type-badge">Package</span>
+        {% endif %}
+        {% if product.get_discount_percent > 0 %}
+            <span class="discount-badge">-{{ product.get_discount_percent }}%</span>
+        {% endif %}
+        {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+        {% else %}
+            <div class="card-img-top d-flex align-items-center justify-content-center bg-light">
+                {% if product.product_type == 'tyre' %}
+                    <span style="font-size:3rem;">🛞</span>
+                {% elif product.product_type == 'rim' %}
+                    <span style="font-size:3rem;">⚙️</span>
+                {% else %}
+                    <span style="font-size:3rem;">🔧</span>
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="card-body">
+            {% if product.brand %}
+            <p class="text-muted small mb-1">{{ product.brand.name }}</p>
+            {% endif %}
+            <h6 class="card-title">{{ product.name|truncatewords:8 }}</h6>
+            {% if product.tyre_size_display %}
+            <p class="small text-muted mb-1">{{ product.tyre_size_display }}</p>
+            {% elif product.rim_size_display %}
+            <p class="small text-muted mb-1">{{ product.rim_size_display }}</p>
+            {% endif %}
+            <div class="d-flex align-items-baseline gap-2">
+                <span class="price">HK${{ product.get_price }}</span>
+                {% if product.discount_price %}
+                <span class="old-price">HK${{ product.price }}</span>
+                {% endif %}
+            </div>
+            <a href="{{ product.get_absolute_url }}" class="btn btn-sm btn-accent mt-2 w-100">View</a>
+        </div>
+    </div>
+</div>
