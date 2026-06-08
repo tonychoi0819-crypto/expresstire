@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ brand.name }} | {{ shop_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'tires:home' %}">主頁</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'tires:brand_list' %}">品牌一覽</a></li>
+            <li class="breadcrumb-item active">{{ brand.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex align-items-center gap-3 mb-4">
+        {% if brand.logo %}
+        <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" style="max-height: 60px;">
+        {% endif %}
+        <div>
+            <h1>{{ brand.name }}</h1>
+            {% if brand.website %}
+            <a href="{{ brand.website }}" target="_blank" class="text-muted small"><i class="bi bi-globe"></i> 官方網站</a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if brand.description %}
+    <div class="alert alert-light border mb-4">
+        {{ brand.description }}
+    </div>
+    {% endif %}
+
+    <h3 class="mb-3">{{ brand.name }} 輪胎型號 <small class="text-muted fs-5">({{ tyres.count }} 款)</small></h3>
+
+    <div class="row g-4">
+        {% for tyre in tyres %}
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="card tyre-card h-100">
+                <div class="card-body">
+                    <small class="text-muted">{{ tyre.brand.name }}</small>
+                    <h6 class="card-title mt-1">
+                        <a href="{{ tyre.get_absolute_url }}" class="text-decoration-none text-dark">{{ tyre.name }}</a>
+                    </h6>
+                    <span class="badge bg-secondary">{{ tyre.get_tyre_type_display }}</span>
+                    {% if tyre.lowest_price %}
+                    <p class="price mb-0 mt-2">HK${{ tyre.lowest_price|floatformat:0|intcomma }}</p>
+                    <small class="text-muted">起 / 連安裝</small>
+                    {% endif %}
+                    <p class="mt-1"><small class="text-muted">{{ tyre.variant_count }} 尺寸</small></p>
+                </div>
+                <div class="card-footer bg-white border-0">
+                    <a href="{{ tyre.get_absolute_url }}" class="btn btn-outline-brand btn-sm w-100">查看價格</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">暫無產品</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
