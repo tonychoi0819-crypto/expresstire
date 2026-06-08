@@ -16,5 +16,15 @@ services:
         value: ".onrender.com"
       - key: PYTHON_VERSION
         value: "3.11"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: expresstire-db
+          property: connectionString
     healthCheckPath: /
     autoDeploy: true
+
+databases:
+  - name: expresstire-db
+    plan: free
+    databaseName: expresstire
+    user: expresstire
