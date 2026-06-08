@@ -1,0 +1,140 @@
+{% extends 'store/base.html' %}
+{% block title %}Tyres & Rims Online | Hong Kong{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1>Find the Perfect Tyres & Rims for Your Car</h1>
+                <p class="lead mb-4">Hong Kong's trusted online tyre shop. Genuous brands, best prices, expert fitting.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'store:fitment_selector' %}" class="btn btn-accent btn-lg">
+                        <i class="bi bi-car-front"></i> Find by Car
+                    </a>
+                    <a href="{% url 'store:product_list' %}" class="btn btn-outline-light btn-lg">
+                        Browse All Products
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                <div style="font-size:8rem;opacity:0.3;">🛞</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Fitment Quick Search -->
+<section class="py-5" style="background:#fff;">
+    <div class="container">
+        <div class="fitment-box text-center">
+            <h3 style="color:#fff;font-weight:800;margin-bottom:6px;">What car do you drive?</h3>
+            <p style="opacity:0.7;margin-bottom:24px;">We'll show you only products that fit</p>
+            <form method="get" action="{% url 'store:fitment_selector' %}">
+                <div class="row g-3 justify-content-center">
+                    <div class="col-md-4">
+                        <select name="make" class="form-select form-select-lg" id="quickMake" onchange="this.form.action='{% url 'store:fitment_selector' %}';this.form.submit()">
+                            <option value="">Select Make</option>
+                            {% for make in makes %}
+                            <option value="{{ make.slug }}">{{ make.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Categories -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="row g-4">
+            <div class="col-6 col-md-3">
+                <a href="{% url 'store:product_list' %}?type=tyre" class="text-decoration-none">
+                    <div class="card product-card text-center p-4" style="height:100%;">
+                        <div style="font-size:3rem;">🛞</div>
+                        <h5 class="mt-2" style="color:#333;">Tyres</h5>
+                        <p class="text-muted small mb-0">All brands & sizes</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'store:product_list' %}?type=rim" class="text-decoration-none">
+                    <div class="card product-card text-center p-4" style="height:100%;">
+                        <div style="font-size:3rem;">⚙️</div>
+                        <h5 class="mt-2" style="color:#333;">Rims & Wheels</h5>
+                        <p class="text-muted small mb-0">Alloy & steel</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'store:product_list' %}?type=package" class="text-decoration-none">
+                    <div class="card product-card text-center p-4" style="height:100%;">
+                        <div style="font-size:3rem;">🎁</div>
+                        <h5 class="mt-2" style="color:#333;">Packages</h5>
+                        <p class="text-muted small mb-0">Tyre + Rim bundles</p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-3">
+                <a href="{% url 'store:product_list' %}?type=accessory" class="text-decoration-none">
+                    <div class="card product-card text-center p-4" style="height:100%;">
+                        <div style="font-size:3rem;">🔧</div>
+                        <h5 class="mt-2" style="color:#333;">Accessories</h5>
+                        <p class="text-muted small mb-0">Valve caps, weights etc</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Products -->
+{% if featured %}
+<section class="py-5" style="background:#fff;">
+    <div class="container">
+        <h2 class="section-title">Featured Deals</h2>
+        <div class="row g-4">
+            {% for product in featured %}
+            {% include 'store/includes/product_card.html' with product=product %}
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'store:product_list' %}" class="btn btn-accent btn-lg">View All Products</a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Trust Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="section-title text-center">Why Choose ExpressTire?</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <div style="font-size:2.5rem;">✅</div>
+                <h6>Genuine Products</h6>
+                <p class="small text-muted">Authorized dealer. 100% authentic tyres & rims.</p>
+            </div>
+            <div class="col-md-3">
+                <div style="font-size:2.5rem;">💰</div>
+                <h6>Best Price</h6>
+                <p class="small text-muted">Beat any genuine quote. Price match guarantee.</p>
+            </div>
+            <div class="col-md-3">
+                <div style="font-size:2.5rem;">🚗</div>
+                <h6>Expert Fitting</h6>
+                <p class="small text-muted">Professional installation at our HK workshop.</p>
+            </div>
+            <div class="col-md-3">
+                <div style="font-size:2.5rem;">🚚</div>
+                <h6>Free Delivery</h6>
+                <p class="small text-muted">Free shipping on orders over HK$2,000.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
