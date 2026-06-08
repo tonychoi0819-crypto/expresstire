@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ tyre.brand.name }} {{ tyre.name }} | {{ shop_name }}{% endblock %}
+{% block meta_desc %}{{ tyre.brand.name }} {{ tyre.name }} - {{ tyre.description|truncatewords:30 }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'tires:home' %}">主頁</a></li>
+            <li class="breadcrumb-item"><a href="{{ tyre.brand.get_absolute_url }}">{{ tyre.brand.name }}</a></li>
+            <li class="breadcrumb-item active">{{ tyre.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Image -->
+        <div class="col-md-5">
+            <div class="card">
+                {% if tyre.image %}
+                <img src="{{ tyre.image.url }}" class="card-img-top" alt="{{ tyre }}">
+                {% else %}
+                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                    <div class="text-center">
+                        <i class="bi bi-image display-1 text-muted"></i>
+                        <p class="text-muted mt-2">{{ tyre.brand.name }} {{ tyre.name }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="col-md-7">
+            <small class="text-muted text-uppercase">{{ tyre.brand.name }}</small>
+            <h1 class="mb-2">{{ tyre.name }}</h1>
+            <span class="badge bg-secondary">{{ tyre.get_tyre_type_display }}</span>
+            <p class="mt-3">{{ tyre.description }}</p>
+            
+            {% if tyre.features %}
+            <h5>產品特點</h5>
+            <ul>
+                {% for feature in tyre.features.splitlines %}
+                {% if feature.strip %}<li>{{ feature }}</li>{% endif %}
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            <div class="alert alert-info mt-3">
+                <i class="bi bi-info-circle"></i> 所有價格已包含專業安裝及動平衡服務
+            </div>
+        </div>
+    </div>
+
+    <!-- Variants / Sizes -->
+    <div class="mt-5">
+        <h3>選擇尺寸 <small class="text-muted fs-5">({{ variants.count }} 個)</small></h3>
+        <div class="row g-3 mt-2">
+            {% for variant in variants %}
+            <div class="col-12 col-sm-6 col-md-4">
+                <div class="card shadow-sm h-100 {% if variant.id == selected_variant.id %}border-primary{% endif %}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h4 class="mb-1"><code>{{ variant.size_display }}</code></h4>
+                            {% if variant.discount_pct > 0 %}
+                            <span class="badge bg-danger">-{{ variant.discount_pct }}%</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mt-2">
+                            {% if variant.original_price %}
+                            <span class="original-price">HK${{ variant.original_price|floatformat:0 }}</span>
+                            {% endif %}
+                            <div class="price">HK${{ variant.price|floatformat:0|intcomma }}</div>
+                            <small class="text-muted">每條 / 連安裝</small>
+                        </div>
+                        
+                        {% if variant.load_index %}
+                        <small class="text-muted">Load: {{ variant.load_index }} | Speed: {{ variant.speed_rating }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-white">
+                        <form action="{% url 'tires:cart_add' variant.id %}?next={{ request.path }}" method="POST" class="d-flex gap-2 align-items-center">
+                            {% csrf_token %}
+                            <input type="number" name="quantity" value="4" min="1" max="10" class="form-control form-control-sm" style="width: 60px;">
+                            <span class="small text-muted">條</span>
+                            <button type="submit" class="btn btn-brand btn-sm flex-grow-1" {% if not variant.in_stock %}disabled{% endif %}>
+                                <i class="bi bi-cart-plus"></i> {% if not variant.in_stock %}缺貨{% else %}加入購物車{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Related -->
+    {% if related_tyres %}
+    <div class="mt-5">
+        <h3>相關產品</h3>
+        <div class="row g-3">
+            {% for rt in related_tyres %}
+            <div class="col-6 col-md-3">
+                <div class="card tyre-card">
+                    <div class="card-body">
+                        <small class="text-muted">{{ rt.brand.name }}</small>
+                        <h6><a href="{{ rt.get_absolute_url }}" class="text-decoration-none text-dark">{{ rt.name }}</a></h6>
+                        {% if rt.lowest_price %}
+                        <span class="price">HK${{ rt.lowest_price|floatformat:0 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
