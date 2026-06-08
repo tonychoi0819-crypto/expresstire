@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}安裝安排 | {{ shop_name }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <h2 class="mb-4">安裝服務</h2>
+    
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-shop display-1 text-brand-red"></i>
+                    <h4 class="mt-3">到店安裝</h4>
+                    <p>駕車到我們的專業輪胎工場，享受以下服務：</p>
+                    <ul class="text-start">
+                        <li>意大利專業拆裝設備</li>
+                        <li>激光動平衡</li>
+                        <li>30分鐘完成安裝</li>
+                        <li>免費檢查胎壓</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <i class="bi bi-truck display-1 text-brand-red"></i>
+                    <h4 class="mt-3">上門安裝</h4>
+                    <p>我們到您指定的地點安裝輪胎：</p>
+                    <ul class="text-start">
+                        <li>專屬安裝車上門服務</li>
+                        <li>全香港九新界</li>
+                        <li>停車場、公司、屋邨皆可</li>
+                        <li>日間服務（額外收費）</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <h4>我們的工場</h4>
+        {% for shop in shops %}
+        <p><strong>{{ shop.name }}</strong><br>{{ shop.address }}<br>營業時間: {{ shop.opening_hours }}</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
