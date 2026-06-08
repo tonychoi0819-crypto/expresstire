@@ -1,0 +1,4 @@
+django>=5.2
+pillow>=12.0
+whitenoise>=6.0
+gunicorn>=26.0
