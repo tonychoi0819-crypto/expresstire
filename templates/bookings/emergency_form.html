@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}緊急求助 | {{ shop_name }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <h2 class="mb-4 text-center"><i class="bi bi-exclamation-triangle text-danger"></i> 緊急求助</h2>
+            <div class="alert alert-danger">
+                <strong>24小時救車熱線: {{ shop_emergency }}</strong><br>
+                非緊急請填表格，緊急請直接致電！
+            </div>
+            <form method="POST" action="{% url 'bookings:emergency_request' %}">
+                {% csrf_token %}
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">姓名 *</label>
+                                <input type="text" name="name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">電話 *</label>
+                                <input type="tel" name="phone" class="form-control" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">位置 *</label>
+                                <input type="text" name="location" class="form-control" placeholder="如：旺角某某停車場B2" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">車型</label>
+                                <input type="text" name="vehicle" class="form-control" placeholder="如：白色 Tesla Model 3">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">服務類型 *</label>
+                                <select name="service_type" class="form-select">
+                                    <option value="flat_tyre">爆胎</option>
+                                    <option value="battery">電池死了</option>
+                                    <option value="puncture">穿胎</option>
+                                    <option value="jump_start">搭電</option>
+                                    <option value="tyre_change">換胎</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">描述</label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="詳細描述..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
+                                    <i class="bi bi-send"></i> 發送緊急求助
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
