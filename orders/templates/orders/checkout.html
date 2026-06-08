@@ -1,0 +1,115 @@
+{% extends 'store/base.html' %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 style="font-weight:800;">Checkout</h2>
+
+    <div class="row g-4 mt-3">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Delivery & Contact Info</h5>
+                    <form method="post" action="{% url 'orders:checkout' %}">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">First Name *</label>
+                                <input type="text" name="first_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Last Name *</label>
+                                <input type="text" name="last_name" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email *</label>
+                                <input type="email" name="email" class="form-control" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone *</label>
+                                <input type="tel" name="phone" class="form-control" required placeholder="+852 XXXX XXXX">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Address (optional)</label>
+                                <input type="text" name="address" class="form-control" placeholder="Leave blank for workshop pickup">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">City</label>
+                                <input type="text" name="city" class="form-control" value="Hong Kong">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Notes / Fitting Instructions</label>
+                                <textarea name="notes" class="form-control" rows="2" placeholder="e.g. Prefer Saturday fitting, call before delivery..."></textarea>
+                            </div>
+                        </div>
+
+                        <h5 class="card-title mt-4 mb-3">Payment Method</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-check card p-3" style="cursor:pointer;">
+                                    <input class="form-check-input" type="radio" name="payment_method" value="whatsapp" id="pay_wa" checked>
+                                    <label class="form-check-label fw-bold" for="pay_wa">
+                                        <i class="bi bi-whatsapp" style="color:#25D366;"></i> WhatsApp Order
+                                    </label>
+                                    <p class="small text-muted mb-0 mt-1">Confirm order via WhatsApp. Pay by FPS/PayMe/cash.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check card p-3" style="cursor:pointer;">
+                                    <input class="form-check-input" type="radio" name="payment_method" value="fps" id="pay_fps">
+                                    <label class="form-check-label fw-bold" for="pay_fps">
+                                        <i class="bi bi-phone"></i> FPS / PayMe
+                                    </label>
+                                    <p class="small text-muted mb-0 mt-1">Pay via bank transfer or PayMe link.</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check card p-3" style="cursor:pointer;">
+                                    <input class="form-check-input" type="radio" name="payment_method" value="cash" id="pay_cash">
+                                    <label class="form-check-label fw-bold" for="pay_cash">
+                                        <i class="bi bi-cash"></i> Cash on Pickup
+                                    </label>
+                                    <p class="small text-muted mb-0 mt-1">Pay when you pick up at our workshop.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-accent btn-lg w-100 mt-4">
+                            Place Order
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm sticky-top" style="top:80px;">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <hr>
+                    {% for item in cart_items %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{{ item.quantity }}x {{ item.product.name }}</span>
+                        <span>HK${{ item.total_price }}</span>
+                    </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>HK${{ subtotal }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping</span>
+                        <span>{% if shipping_cost == 0 %}FREE{% else %}HK${{ shipping_cost }}{% endif %}</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <strong>Total</strong>
+                        <strong style="font-size:1.3rem;color:var(--accent);">HK${{ total }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
