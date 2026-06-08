@@ -1,0 +1,84 @@
+{% extends 'store/base.html' %}
+{% block title %}Find Tyres & Rims by Car{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 style="font-weight:800;">Find the Right Fit for Your Car</h2>
+        <p class="text-muted">Select your car make, model, and year to see compatible tyres & rims</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="fitment-box">
+                <form method="get" action="{% url 'store:fitment_selector' %}">
+                    <!-- Step 1: Make -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" style="color:#fff;">Step 1: Select Make</label>
+                        <select name="make" class="form-select form-select-lg" onchange="this.form.submit()">
+                            <option value="">-- Choose Make --</option>
+                            {% for make in makes %}
+                            <option value="{{ make.slug }}" {% if selected_make == make %}selected{% endif %}>{{ make.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Step 2: Model -->
+                    {% if models is not None %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" style="color:#fff;">Step 2: Select Model</label>
+                        <select name="model" class="form-select form-select-lg" onchange="this.form.submit()">
+                            <option value="">-- Choose Model --</option>
+                            {% for model in models %}
+                            <option value="{{ model.slug }}" {% if selected_model == model %}selected{% endif %}>{{ model.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <!-- Step 3: Year -->
+                    {% if years is not None %}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" style="color:#fff;">Step 3: Select Year</label>
+                        <select name="year" class="form-select form-select-lg" onchange="this.form.submit()">
+                            <option value="">-- Choose Year --</option>
+                            {% for year in years %}
+                            <option value="{{ year.id }}" {% if selected_year == year %}selected{% endif %}>{{ year.year }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results -->
+    {% if products is not None %}
+    <div class="mt-5">
+        {% if products %}
+        <h4 style="font-weight:700;">
+            {% if selected_make and selected_model and selected_year %}
+                {{ selected_make.name }} {{ selected_model.name }} {{ selected_year.year }} — Compatible Products
+            {% endif %}
+            <small class="text-muted">({{ products|length }} found)</small>
+        </h4>
+        <div class="row g-4 mt-3">
+            {% for product in products %}
+            {% include 'store/includes/product_card.html' with product=product %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <div style="font-size:3rem;">🔍</div>
+            <h5>No products found for this vehicle</h5>
+            <p class="text-muted">Try a different selection or <a href="{% url 'store:product_list' %}">browse all products</a>.</p>
+            <a href="https://wa.me/85212345678?text=Hi! I need tyres/rims for {{ selected_make.name }} {{ selected_model.name }} {{ selected_year.year }}" class="btn btn-whatsapp" target="_blank">
+                <i class="bi bi-whatsapp"></i> Ask Us on WhatsApp
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
