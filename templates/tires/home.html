@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}{{ shop_name }} - 香港頂級輪胎專門店 | 各大品牌包安裝{% endblock %}
+
+{% block content %}
+<!-- Hero -->
+<section class="hero">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-5 fw-bold mb-3">全港最齊輪胎 | 包安裝包動平衡</h1>
+                <p class="lead mb-4 opacity-75">Michelin · Pirelli · Yokohama · Bridgestone · Dunlop · Goodyear · Hankook</p>
+                
+                <!-- Search by size -->
+                <div class="hero-search bg-white rounded-4 p-4 shadow-lg">
+                    <form action="{% url 'tires:search' %}" method="GET" class="row g-2 align-items-end">
+                        <div class="col-6 col-md-3">
+                            <label class="form-label text-dark fw-bold">闊度</label>
+                            <select name="width" class="form-select">
+                                <option value="">Any</option>
+                                <option value="185">185</option>
+                                <option value="195">195</option>
+                                <option value="205">205</option>
+                                <option value="215">215</option>
+                                <option value="225" selected>225</option>
+                                <option value="235">235</option>
+                                <option value="245">245</option>
+                                <option value="255">255</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label text-dark fw-bold">扁平比</label>
+                            <select name="aspect" class="form-select">
+                                <option value="">Any</option>
+                                <option value="35">35</option>
+                                <option value="40">40</option>
+                                <option value="45" selected>45</option>
+                                <option value="50">50</option>
+                                <option value="55">55</option>
+                                <option value="60">60</option>
+                                <option value="65">65</option>
+                                <option value="70">70</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label text-dark fw-bold">吋</label>
+                            <select name="diameter" class="form-select">
+                                <option value="">Any</option>
+                                <option value="15">15"</option>
+                                <option value="16">16"</option>
+                                <option value="17" selected>17"</option>
+                                <option value="18">18"</option>
+                                <option value="19">19"</option>
+                                <option value="20">20"</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <label class="form-label text-dark fw-bold">品牌</label>
+                            <select name="brand" class="form-select">
+                                <option value="">All</option>
+                                <option value="michelin">Michelin</option>
+                                <option value="pirelli">Pirelli</option>
+                                <option value="yokohama">Yokohama</option>
+                                <option value="dunlop">Dunlop</option>
+                                <option value="goodyear">Goodyear</option>
+                                <option value="hankook">Hankook</option>
+                                <option value="bridgestone">Bridgestone</option>
+                                <option value="continental">Continental</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <button type="submit" class="btn btn-brand w-100 py-2 fw-bold" style="border-radius: 8px;">
+                                <i class="bi bi-search"></i> 搜尋輪胎
+                            </button>
+                        </div>
+                    </form>
+                    <!-- Quick size links -->
+                    <div class="mt-2 text-start">
+                        <small class="text-dark">熱門尺寸:</small>
+                        {% for size in popular_sizes %}
+                        <a href="{% url 'tires:size_search' size.width size.aspect size.diameter %}" 
+                           class="badge bg-light text-dark text-decoration-none ms-1">{{ size.size_display }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Promotions -->
+{% if promos %}
+<section class="py-4" style="background: #fff3cd;">
+    <div class="container">
+        <div class="row g-3">
+            {% for promo in promos %}
+            <div class="col-md-4">
+                <div class="card h-100 border-warning">
+                    <div class="card-body">
+                        <span class="badge bg-danger mb-2">推廣</span>
+                        <h5 class="card-title">{{ promo.title }}</h5>
+                        <p class="card-text small">{{ promo.description }}</p>
+                        {% if promo.code %}
+                        <p class="mb-0"><strong>優惠碼: <code>{{ promo.code }}</code></strong></p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Featured Tyres -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="mb-4 text-center">精選推介 <span class="fs-5 text-muted">| Featured Tyres</span></h2>
+        <div class="row g-4">
+            {% for tyre in featured_tyres %}
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card tyre-card h-100">
+                    <div class="card-body">
+                        <small class="text-muted">{{ tyre.brand.name }}</small>
+                        <h6 class="card-title mt-1">
+                            <a href="{{ tyre.get_absolute_url }}" class="text-decoration-none text-dark">{{ tyre.name }}</a>
+                        </h6>
+                        {% if tyre.lowest_price %}
+                        <p class="price mb-0">HK${{ tyre.lowest_price|floatformat:0|intcomma }}</p>
+                        <small class="text-muted">起 / 連安裝</small>
+                        {% endif %}
+                        <p class="mt-1"><small class="text-muted">{{ tyre.variant_count }} 尺寸</small></p>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{{ tyre.get_absolute_url }}" class="btn btn-outline-brand btn-sm w-100">查看價格</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <p class="text-muted">Seeding products...</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Popular Sizes -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="mb-4 text-center">熱門尺寸 <span class="fs-5 text-muted">| Popular Sizes</span></h2>
+        <div class="d-flex flex-wrap justify-content-center">
+            <a href="{% url 'tires:size_search' 225 45 17 %}" class="btn btn-outline-secondary m-1">225/45R17</a>
+            <a href="{% url 'tires:size_search' 205 55 16 %}" class="btn btn-outline-secondary m-1">205/55R16</a>
+            <a href="{% url 'tires:size_search' 235 55 18 %}" class="btn btn-outline-secondary m-1">235/55R18</a>
+            <a href="{% url 'tires:size_search' 245 40 18 %}" class="btn btn-outline-secondary m-1">245/40R18</a>
+            <a href="{% url 'tires:size_search' 255 35 19 %}" class="btn btn-outline-secondary m-1">255/35R19</a>
+            <a href="{% url 'tires:size_search' 195 65 15 %}" class="btn btn-outline-secondary m-1">195/65R15</a>
+            <a href="{% url 'tires:size_search' 225 40 18 %}" class="btn btn-outline-secondary m-1">225/40R18</a>
+            <a href="{% url 'tires:size_search' 215 55 17 %}" class="btn btn-outline-secondary m-1">215/55R17</a>
+        </div>
+    </div>
+</section>
+
+<!-- Brands -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="mb-4 text-center">合作品牌 <span class="fs-5 text-muted">| Brands</span></h2>
+        <div class="row g-3 justify-content-center">
+            {% for brand in brands %}
+            <div class="col-4 col-md-3 col-lg-2 text-center">
+                <a href="{{ brand.get_absolute_url }}" class="text-decoration-none">
+                    <div class="p-3 border rounded-3 h-100 d-flex align-items-center justify-content-center" style="min-height: 80px;">
+                        {% if brand.logo %}
+                        <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" style="max-height: 50px;">
+                        {% else %}
+                        <span class="fw-bold text-dark">{{ brand.name }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Trust section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3">
+                <i class="bi bi-shield-check display-4 text-brand-red"></i>
+                <h5 class="mt-2">包安裝包動平衡</h5>
+                <p class="text-muted small">所有輪胎價格已包含專業安裝及動平衡</p>
+            </div>
+            <div class="col-md-3">
+                <i class="bi bi-truck display-4 text-brand-red"></i>
+                <h5 class="mt-2">上门服务</h5>
+                <p class="text-muted small">火炭及土瓜灣分店提供上門安裝服務</p>
+            </div>
+            <div class="col-md-3">
+                <i class="bi bi-clock-history display-4 text-brand-red"></i>
+                <h5 class="mt-2">24H 緊急救車</h5>
+                <p class="text-muted small">爆胎、電池問題，全年無休緊急服務</p>
+            </div>
+            <div class="col-md-3">
+                <i class="bi bi-credit-card display-4 text-brand-red"></i>
+                <h5 class="mt-2">多種付款方式</h5>
+                <p class="text-muted small">FPS、PayMe、Alipay、信用卡，全部支援</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Lead capture -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4 text-center">
+                        <h3>找不到合適尺寸？</h3>
+                        <p class="text-muted">Tell us your car model or tyre size, our experts will recommend the best options within 1 hour.</p>
+                        <form action="{% url 'tires:enquiry' %}" method="POST" class="row g-2">
+                            {% csrf_token %}
+                            <div class="col-md-4"><input type="text" name="name" class="form-control" placeholder="姓名" required></div>
+                            <div class="col-md-4"><input type="tel" name="phone" class="form-control" placeholder="電話" required></div>
+                            <div class="col-md-4"><input type="text" name="size" class="form-control" placeholder="e.g. 225/45R17"></div>
+                            <div class="col-12"><input type="text" name="tyre_interest" class="form-control" placeholder="想尋找的輪胎品牌/型號（option）"></div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-brand w-100 py-2">
+                                    <i class="bi bi-whatsapp"></i> WhatsApp / 電話回覆
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
