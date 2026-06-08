@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}24H 緊急救車 | {{ shop_name }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="bg-danger text-white rounded-4 p-5 mb-4">
+                <i class="bi bi-exclamation-triangle display-1"></i>
+                <h1 class="mt-3">24小時流動救車服務</h1>
+                <h3>爆胎 · 電池 · 搭電 · 補胎</h3>
+                <p class="display-6 fw-bold mt-3">{{ shop_emergency }}</p>
+                <a href="https://wa.me/{{ shop_whatsapp|cut:'+' }}?text=Emergency! Need tyre assistance" class="btn btn-light btn-lg mt-2">
+                    <i class="bi bi-whatsapp"></i> WhatsApp 即時聯絡
+                </a>
+            </div>
+
+            <h3 class="mb-3">緊急求助表格</h3>
+            <form method="POST" class="text-start">
+                {% csrf_token %}
+                <div class="row g-2">
+                    <div class="col-md-6"><input type="text" name="name" class="form-control" placeholder="姓名" required></div>
+                    <div class="col-md-6"><input type="tel" name="phone" class="form-control" placeholder="電話" required></div>
+                    <div class="col-12"><input type="text" name="location" class="form-control" placeholder="位置（如：旺角某某停車場B2）" required></div>
+                    <div class="col-md-6"><input type="text" name="vehicle" class="form-control" placeholder="車型（如：白色 Tesla Model 3）"></div>
+                    <div class="col-md-6">
+                        <select name="service_type" class="form-select">
+                            <option value="flat_tyre">爆胎</option>
+                            <option value="battery">電池死了</option>
+                            <option value="puncture">穿胎</option>
+                            <option value="jump_start">撘電</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="col-12"><textarea name="description" class="form-control" rows="2" placeholder="描述"></textarea></div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-danger w-100 py-2 fw-bold">
+                            <i class="bi bi-send"></i> ✓ 發送緊急求助
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
