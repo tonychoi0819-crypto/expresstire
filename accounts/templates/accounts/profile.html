@@ -1,0 +1,16 @@
+{% extends 'store/base.html' %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 style="font-weight:800;">My Profile</h2>
+    <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Member since:</strong> {{ user.date_joined|date:"M d, Y" }}</p>
+            <a href="{% url 'orders:order_history' %}" class="btn btn-accent">View My Orders</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
