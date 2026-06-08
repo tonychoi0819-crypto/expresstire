@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}關於我們 | {{ shop_name }}{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="mb-4">關於 ExpressTire</h2>
+            <p class="lead">自1989年起，ExpressTire 一直為香港車主提供最專業的輪胎服務。</p>
+            
+            <h4 class="mt-4">我們的服務</h4>
+            <ul>
+                <li>🛞 <strong>輪胎零售及安裝</strong> — 各大品牌，包安裝包動平衡</li>
+                <li>🔧 <strong>專業補胎</strong> — 穿孔修補 ($80) 或內層密封 ($150-$200)</li>
+                <li>🔋 <strong>汽車電池更換</strong> — 上門安裝</li>
+                <li>🚗 <strong>24小時緊急救車</strong> — 爆胎、電池、搭電</li>
+                <li>🚛 <strong>上門安裝服務</strong> — 專車開到您指定的地點</li>
+            </ul>
+
+            <h4 class="mt-4">為什麼選擇我們？</h4>
+            <ul>
+                <li>🇮🇹 意大利進口專業拆裝設備 (Teco / Corghi) — 避免刮花輪圈</li>
+                <li>⚖️ 專業激光動平衡 — 確保行駛平順</li>
+                <li>💰 透明價格 — 標價已含安裝及動平衡</li>
+                <li>📍 兩間分店 — 土瓜灣及火炭</li>
+                <li>💳 多種付款方式 — FPS、PayMe、Alipay、信用卡</li>
+            </ul>
+
+            <h4 class="mt-4">分店地址</h4>
+            <p><strong>土瓜灣總店:</strong> {{ shop_address }}<br>
+            電話: {{ shop_phone }} | WhatsApp: {{ shop_whatsapp }}</p>
+            <p><strong>火炭分店:</strong> Unit i, International Industrial Centre, 2-8 Kwei Tei Street, Fo Tan, Sha Tin</p>
+            
+            <div class="alert alert-info mt-4">
+                <i class="bi bi-exclamation-triangle"></i> <strong>24H 緊急救車:</strong> {{ shop_emergency }} (英語 / WhatsApp)
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
